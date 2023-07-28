@@ -19,8 +19,10 @@ def exe():
     for elem in elems:
         try:
             s = str(elem.contents[0])
+            e = str(elem)
             if flag:
-                schedule.append([date, s])
+                url = "https://atcoder.jp" + e[9:25]
+                schedule.append([date, s, url])
                 flag = False
                 
             if s[:5] == "<time":
@@ -33,3 +35,5 @@ def exe():
             continue
         
     return schedule
+
+exe()

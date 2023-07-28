@@ -12,13 +12,17 @@ TOKEN = datalist[0][7:]
 CHANNEL_ID_schedule = int(datalist[1][21:])
 f.close()
 client = discord.Client(intents=discord.Intents.all())
+
+# 定数定義
+ABC = 'AtCoder Beginner Contest'
+ARC = 'AtCoder Regular Contest'
+AGC = 'AtCoder Grand Contest'
 # -------------------------------------------------------
 
 
 # 開始時 -------------------------------------------------
 @client.event
 async def on_ready():
-    print(f'ログイン：{client.user.name}')
     schedule.start()  # 月曜9時にリマインドする機能
 # -------------------------------------------------------
 
@@ -31,8 +35,7 @@ async def on_message(message):
         return
 # -------------------------------------------------------
 
-
-# 月曜9時にコンテストをリマインドする機能 ----------------------
+# コンテストをリマインドする機能 -----------------------------
 @tasks.loop(seconds=60)
 async def schedule():
     now = datetime.now().strftime('%A:%H:%M')
@@ -42,25 +45,103 @@ async def schedule():
         channel = client.get_channel(CHANNEL_ID_schedule)
         
         embed = discord.Embed(title="今週のコンテスト予定", color=0x00ff00)
-        await channel.send(embed=embed)
         
         for content in contents:
             date = content[0]
             title = content[1]
+            url = content[2]
             flag = False
             
-            if 'AtCoder Beginner Contest' in title:
-                embed = discord.Embed(title=title, color=0x0000ff, description=date)
+            if ABC in title:
+                embed = discord.Embed(title=title, color=0x0000ff, description=date, url=url)
                 flag = True
-            elif 'AtCoder Regular Contest' in title:
-                embed = discord.Embed(title=title, color=0xfd7e00, description=date)
+            elif ARC in title:
+                embed = discord.Embed(title=title, color=0xfd7e00, description=date, url=url)
                 flag = True
-            elif 'AtCoder Grand Contest' in title:
-                embed = discord.Embed(title=title, color=0xff0000, description=date)
+            elif AGC in title:
+                embed = discord.Embed(title=title, color=0xff0000, description=date, url=url)
                 flag = True
             
             if flag:
                 await channel.send(embed=embed)
+    
+    if now[-5:] == '20:00':  # コンテストの1時間前にリマインド
+        contents = func_schedule.exe()
+        channel = client.get_channel(CHANNEL_ID_schedule)
+        
+        for content in contents:
+            date = content[0]
+            title = content[1]
+            url = content[2]
+            flag = False
+            message = '@everyone\n'
+            now_date = str(datetime.now())
+            
+            if date[0:10] != now_date[0:10]:
+                continue
+            
+            if ABC in title:
+                n = title.find(ABC)
+                m = len(ABC)
+                title = title[n : n+m+4]
+                message += '**' + title + '** まであと1時間です'
+                flag = True
+                
+            elif ARC in title:
+                n = title.find(ARC)
+                m = len(ARC)
+                title = title[n : n+m+4]
+                message += '**' + title + '** まであと1時間です'
+                flag = True
+                
+            elif AGC in title:
+                n = title.find(AGC)
+                m = len(AGC)
+                title = title[n : n+m+4]
+                message += '**' + title + '** まであと1時間です'
+                flag = True
+            
+            if flag:
+                await channel.send(message)
+    
+    if now[-5:] == '20:50':  # コンテストの10分前にリマインド
+        contents = func_schedule.exe()
+        channel = client.get_channel(CHANNEL_ID_schedule)
+        
+        for content in contents:
+            date = content[0]
+            title = content[1]
+            url = content[2]
+            flag = False
+            message = '@everyone\n'
+            now_date = str(datetime.now())
+            
+            if date[0:10] != now_date[0:10]:
+                continue
+            
+            if ABC in title:
+                n = title.find(ABC)
+                m = len(ABC)
+                title = title[n : n+m+4]
+                message += '**' + title + '** まであと10分です'
+                flag = True
+                
+            elif ARC in title:
+                n = title.find(ARC)
+                m = len(ARC)
+                title = title[n : n+m+4]
+                message += '**' + title + '** まであと10分です'
+                flag = True
+                
+            elif AGC in title:
+                n = title.find(AGC)
+                m = len(AGC)
+                title = title[n : n+m+4]
+                message += '**' + title + '** まであと10分です'
+                flag = True
+            
+            if flag:
+                await channel.send(message)
 # -------------------------------------------------------
 
 
