@@ -19,12 +19,6 @@ def exe():
     
     list = []
     for i in range(num):
-        # url = 'https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + members[i] + '&from_second=' + str(epoch_second)
-        # response = requests.get(url)
-        # soup = BeautifulSoup(response.text, "html.parser")
-        # cnt = str(soup).count("\"AC\"")
-        # list.append([members[i], cnt])
-        
         # 本日のAC数
         url = f'https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + members[i] + '&from_second=' + str(epoch_second)
         response = requests.get(url).json()
