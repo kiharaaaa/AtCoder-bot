@@ -38,15 +38,26 @@ async def on_message(message):
   # 受信したメッセージの送信者が自分の時
   if message.author.bot:
     return
+  if message.content == "/test":
+    contents = func_submissions.exe()
+    channel = client.get_channel(CHANNEL_ID_submissions)
+
+    now = datetime.now()
+    embed = discord.Embed(title= str(now.month) + "/" + str(now.day - 1) + " AC数",
+                          description=contents,
+                          color=0x00ff00)
+    await channel.send(embed=embed)
+    return
 # -------------------------------------------------------
 
 
 # コンテストをリマインドする機能 -----------------------------
+# その日のAC数を通知する機能 --------------------------------
 @tasks.loop(seconds=60)
 async def schedule():
   now = datetime.now().strftime('%A:%H:%M')
 
-  if now == 'Fryday:00:00':  # 毎週月曜9:00に今週のコンテスト予定を通知
+  if now == 'Fryday:00:00':  # 毎週金曜9:00に今週のコンテスト予定を通知
     contents = func_schedule.exe()
     channel = client.get_channel(CHANNEL_ID_schedule)
 
@@ -79,18 +90,18 @@ async def schedule():
 
       if flag:
         await channel.send(embed=embed)
-  
-  if now[-5:] == '15:00':  # 毎日0時にAC数を通知
+
+  if now[-5:] == '15:05':  # 毎日0:05にAC数を通知
     contents = func_submissions.exe()
     channel = client.get_channel(CHANNEL_ID_submissions)
-    
-    now = datetime.now()
-    embed = discord.Embed(title= str(now.month) + "/" + str(now.day - 1) + " AC数",
+
+    n = datetime.now()
+    embed = discord.Embed(title= str(n.month) + "/" + str(n.day) + " AC数",
                           description=contents,
                           color=0x00ff00)
     await channel.send(embed=embed)
     return
-  
+
   if now[-5:] == '11:00':  # コンテストの1時間前にリマインド
     contents = func_schedule.exe()
     channel = client.get_channel(CHANNEL_ID_schedule)

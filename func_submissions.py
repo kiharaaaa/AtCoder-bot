@@ -7,16 +7,17 @@ from bs4 import BeautifulSoup
 
 def exe():
     now = datetime.datetime.now()
+    now -= datetime.timedelta(hours=9)
     d = datetime.datetime(now.year, now.month, now.day-1, 0, 0, 0)
     epoch_second = int(time.mktime(d.timetuple()))  # UNIX時間を取得
-    
+
     lines=[]
     with open("setting.txt", "r") as f:
         lines = f.readlines()
     members = lines[3].split()
     members.pop(0)
     num = len(members)
-    
+
     list = []
     for i in range(num):
         # 本日のAC数
@@ -26,13 +27,13 @@ def exe():
         cnt = 0
         for p in response:
             p_id = p['problem_id']
-            
+
             if p['result'] != 'AC':
                 continue
             if p_id not in accepted:
                 accepted.append(p_id)
                 cnt += 1
-        
+
         # Current Streak
         streak = 0
         if cnt != 0:
@@ -53,7 +54,7 @@ def exe():
         list.append([members[i], cnt, streak])
     print(list)
     sorted(list, key=lambda x: x[1], reverse=True)
-    
+
     text = ""
     for i in range(num):
         n = len(list[i][0])

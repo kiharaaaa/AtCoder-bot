@@ -24,7 +24,7 @@ def exe():
                 url = "https://atcoder.jp" + e[9:25]
                 schedule.append([date, s, url])
                 flag = False
-                
+
             if s[:5] == "<time":
                 date = s[35:51]
                 if now < date and date < next:
@@ -33,7 +33,7 @@ def exe():
                     date = ""
         except:
             continue
-        
+
     return schedule
 
 exe()
