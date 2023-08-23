@@ -19,7 +19,9 @@ def exe():
     num = len(members)
 
     list = []
+    epoch = epoch_second
     for i in range(num):
+        epoch_second = epoch
         # 本日のAC数
         url = f'https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + members[i] + '&from_second=' + str(epoch_second)
         response = requests.get(url).json()
@@ -41,7 +43,7 @@ def exe():
                 streak += 1
                 flag = True
                 epoch_second -= 86400
-                url = f'https://kenkoooo.com/atcoder/atcoder-api/results?user=' + members[i] + '&from_second=' + str(epoch_second)
+                url = f'https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + members[i] + '&from_second=' + str(epoch_second)
                 response = requests.get(url).json()
                 for p in response:
                     if epoch_second <= p['epoch_second'] and p['epoch_second'] <= epoch_second + 86000:
@@ -50,10 +52,9 @@ def exe():
                             break
                 if flag:
                     break
-
         list.append([members[i], cnt, streak])
+    list = sorted(list, reverse=True, key=lambda x: x[1])
     print(list)
-    sorted(list, key=lambda x: x[1], reverse=True)
 
     text = ""
     for i in range(num):
