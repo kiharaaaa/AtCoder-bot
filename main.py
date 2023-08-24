@@ -38,16 +38,6 @@ async def on_message(message):
   # 受信したメッセージの送信者が自分の時
   if message.author.bot:
     return
-  if message.content == "/test":
-    contents = func_submissions.exe()
-    channel = client.get_channel(CHANNEL_ID_submissions)
-
-    now = datetime.now()
-    embed = discord.Embed(title= str(now.month) + "/" + str(now.day - 1) + " AC数",
-                          description=contents,
-                          color=0x00ff00)
-    await channel.send(embed=embed)
-    return
 # -------------------------------------------------------
 
 
@@ -100,6 +90,7 @@ async def schedule():
                           description=contents,
                           color=0x00ff00)
     await channel.send(embed=embed)
+    await channel.send(file=discord.File('ACgraph.png'))
     return
 
   if now[-5:] == '11:00':  # コンテストの1時間前にリマインド
