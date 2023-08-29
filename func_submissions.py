@@ -1,6 +1,7 @@
 # 提出結果を通知
 
 import datetime
+from zoneinfo import ZoneInfo
 import time
 import requests
 from bs4 import BeautifulSoup
@@ -8,12 +9,12 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 
 def exe():
-    now = datetime.datetime.now()
-    now -= datetime.timedelta(hours=9)
-    d = datetime.datetime(now.year, now.month, now.day-1, 15, 0, 0)
+    now = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
+    d = datetime.datetime(now.year, now.month, now.day-1, 0, 0, 0)
     epoch_second = int(time.mktime(d.timetuple()))  # UNIX時間を取得
 
     lines=[]
+    colors = ['blue', 'orange', 'green', 'red']
     with open("setting.txt", "r") as f:
         lines = f.readlines()
     members = lines[3].split()
@@ -22,8 +23,8 @@ def exe():
 
     # X軸 (日付)
     X = []
-    now_tmp = datetime.datetime.now()
-    now_tmp -= datetime.timedelta(days=10)
+    now_tmp = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
+    now_tmp -= datetime.timedelta(days=11)
     now_month = now.month
     for i in range(10):
         now_tmp += datetime.timedelta(days=1)
@@ -37,6 +38,7 @@ def exe():
         X.append(x)
 
     list = []
+    handles = []
     epoch = epoch_second
     for i in range(num):
         epoch_second = epoch
@@ -90,13 +92,14 @@ def exe():
                     break
         Y.reverse()
         print(Y)
-        plt.plot(X, Y, label=members[i])
+        line, = plt.plot(X, Y, label=members[i], color=colors[i])
+        handles.append(line)
         list.append([members[i], cnt, streak])
     list = sorted(list, reverse=True, key=lambda x: x[1])
     plt.xlabel('日付')
     plt.ylabel('AC数')
     plt.grid(axis='y')
-    plt.legend(loc="upper left")
+    plt.legend(handles, members, loc="upper left")
     plt.savefig('ACgraph.png')
 
     text = ""
