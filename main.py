@@ -2,6 +2,7 @@ import discord
 from discord.ext import tasks
 import asyncio
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import os
 
 from keep_alive import keep_alive
@@ -16,7 +17,7 @@ CHANNEL_ID_schedule = int(datalist[1][21:])
 CHANNEL_ID_submissions = int(datalist[2][24:])
 f.close()
 client = discord.Client(intents=discord.Intents.all())
-#keep_alive()
+keep_alive()
 
 # 定数定義
 ABC = 'AtCoder Beginner Contest'
@@ -28,7 +29,9 @@ AGC = 'AtCoder Grand Contest'
 # 開始時 -------------------------------------------------
 @client.event
 async def on_ready():
-  schedule.start()  # 月曜9時にリマインドする機能
+  schedule.start()
+
+
 # -------------------------------------------------------
 
 
@@ -38,15 +41,18 @@ async def on_message(message):
   # 受信したメッセージの送信者が自分の時
   if message.author.bot:
     return
+
+
 # -------------------------------------------------------
 
 
 # コンテストをリマインドする機能 -----------------------------
+# その日のAC数を通知する機能 --------------------------------
 @tasks.loop(seconds=60)
 async def schedule():
-  now = datetime.now().strftime('%A:%H:%M')
+  now = datetime.now(ZoneInfo("Asia/Tokyo")).strftime('%A:%H:%M')
 
-  if now == 'Fryday:00:00':  # 毎週月曜9:00に今週のコンテスト予定を通知
+  if now == 'Fryday:09:00':  # 毎週金曜9:00に今週のコンテスト予定を通知
     contents = func_schedule.exe()
     channel = client.get_channel(CHANNEL_ID_schedule)
 
@@ -79,19 +85,21 @@ async def schedule():
 
       if flag:
         await channel.send(embed=embed)
-  
-  if now[-5:] == '15:00':  # 毎日0時にAC数を通知
+
+  if now[-5:] == '00:05':  # 毎日0:05にAC数を通知
     contents = func_submissions.exe()
     channel = client.get_channel(CHANNEL_ID_submissions)
-    
-    now = datetime.now()
-    embed = discord.Embed(title= str(now.month) + "/" + str(now.day - 1) + " AC数",
+
+    n = datetime.now(ZoneInfo("Asia/Tokyo"))
+    embed = discord.Embed(title=str(n.month) + "/" + str(int(n.day) - 1) +
+                          " AC数",
                           description=contents,
                           color=0x00ff00)
     await channel.send(embed=embed)
+    await channel.send(file=discord.File('ACgraph.png'))
     return
-  
-  if now[-5:] == '11:00':  # コンテストの1時間前にリマインド
+
+  if now[-5:] == '20:00':  # コンテストの1時間前にリマインド
     contents = func_schedule.exe()
     channel = client.get_channel(CHANNEL_ID_schedule)
 
@@ -130,7 +138,7 @@ async def schedule():
       if flag:
         await channel.send(message)
 
-  if now[-5:] == '11:50':  # コンテストの10分前にリマインド
+  if now[-5:] == '20:50':  # コンテストの10分前にリマインド
     contents = func_schedule.exe()
     channel = client.get_channel(CHANNEL_ID_schedule)
 
@@ -168,6 +176,8 @@ async def schedule():
 
       if flag:
         await channel.send(message)
+
+
 # -------------------------------------------------------
 
 # botを実行 ----------------------------------------------
