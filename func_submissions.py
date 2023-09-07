@@ -7,17 +7,19 @@ import requests
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 import japanize_matplotlib
+import numpy as np
 
 def exe():
     now = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
     d = datetime.datetime(now.year, now.month, now.day-1, 0, 0, 0)
     epoch_second = int(time.mktime(d.timetuple()))  # UNIX時間を取得
+    maxAC = 0
 
     lines=[]
     colors = ['blue', 'orange', 'green', 'red']
     with open("setting.txt", "r") as f:
         lines = f.readlines()
-    members = lines[3].split()
+    members = lines[4].split()
     members.pop(0)
     num = len(members)
 
@@ -25,7 +27,7 @@ def exe():
     X = []
     now_tmp = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
     now_tmp -= datetime.timedelta(days=11)
-    now_month = now.month
+    now_month = now_tmp.month
     for i in range(10):
         now_tmp += datetime.timedelta(days=1)
         if i == 0:
@@ -91,14 +93,15 @@ def exe():
                 if ACflag == False:
                     break
         Y.reverse()
-        print(Y)
+        if max(Y) > maxAC:
+            maxAC = max(Y)
         line, = plt.plot(X, Y, label=members[i], color=colors[i])
         handles.append(line)
         list.append([members[i], cnt, streak])
     list = sorted(list, reverse=True, key=lambda x: x[1])
     plt.xlabel('日付')
     plt.ylabel('AC数')
-    plt.grid(axis='y')
+    plt.yticks(np.arange(0, maxAC+1, 1))
     plt.legend(handles, members, loc="upper left")
     plt.savefig('ACgraph.png')
 
@@ -113,5 +116,3 @@ def exe():
         if i != num - 1:
             text += "\n"
     return text
-
-exe()

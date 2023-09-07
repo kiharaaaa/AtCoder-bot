@@ -35,5 +35,3 @@ def exe():
             continue
 
     return schedule
-
-exe()
